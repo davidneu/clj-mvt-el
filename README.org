@@ -1,0 +1,56 @@
+#+title:   clj-mvt-el
+#+startup: showall
+#+OPTIONS: toc:nil author:nil timestamp:nil
+
+* Overview
+
+The [[https://github.com/davidneu/clj-mvt][clj-mvt]], /minimum viable toolset/, library provides a small set of
+Clojure tools that combined with emacs and the [[https://github.com/davidneu/clj-mvt-el][clj-mvt-el]], [[https://github.com/clojure-emacs/clojure-mode][clojure-mode]],
+and [[https://github.com/clojure-emacs/inf-clojure][inf-clojure]] emacs packages, provide a simple REPL driven
+development environment.
+
+* Requirements
+
+Emacs version 25.1 is required to run clojure-mode and therefore
+needed to run clj-mvt-el.
+
+* Installation
+
+If you use the emacs package manager (i.e. package.el) and
+[[https://github.com/jwiegley/use-package][use-package]], then include the following in your emacs init file
+
+#+BEGIN_SRC emacs-lisp
+(use-package paredit
+  :ensure t
+  :diminish (paredit-mode . "pe"))
+
+(use-package inf-clojure
+  :ensure t
+  :init
+  (add-hook 'inf-clojure-mode-hook (lambda () (setq tab-width 4)))
+  (add-hook 'inf-clojure-mode-hook 'paredit-mode)
+  (add-hook 'inf-clojure-mode-hook 'clj-mvt-el-repl-minor-mode))
+
+(use-package clojure-mode
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook 'paredit-mode)
+  (add-hook 'clojure-mode-hook 'inf-clojure-minor-mode)
+  (add-hook 'inf-clojure-minor-mode-hook 'clj-mvt-el-src-minor-mode))
+#+END_SRC
+
+* Usage
+
+See [[https://github.com/davidneu/clj-mvt-eg/][clj-mvt-eg]] for an example project and installation and instructions.
+
+* Acknowledgments
+
+Many thanks to [[https://github.com/bbatsov][Bozhidar Batsov]] for inf-clojure.
+
+* License
+
+Copyright © 2019 David J. Neu
+
+Distributed under the GNU General Public License; type C-h C-c to view
+it.
+
