@@ -41,7 +41,8 @@ If you use the emacs package manager (i.e. package.el) and
 
 * Usage
 
-See [[https://github.com/davidneu/clj-mvt-eg/][clj-mvt-eg]] for an example project and installation and instructions.
+See [[https://github.com/davidneu/clj-mvt-eg/][clj-mvt-eg]] for an example project and installation and usage
+instructions.
 
 * Acknowledgments
 
