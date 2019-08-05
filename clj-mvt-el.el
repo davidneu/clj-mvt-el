@@ -164,20 +164,20 @@
 ;;;###autoload
 (progn
   ;; both inf-clojure-mode and inf-clojure-minor-mode
-  (advice-add 'inf-clojure-load-file :before (lambda (&optional switch-to-repl file-name) (save-some-buffers)))
-  (advice-add 'inf-clojure-load-file :after (lambda (&optional switch-to-repl file-name) (inf-clojure-switch-to-repl t)))
+  (advice-add 'inf-clojure-load-file :before (lambda (&optional _switch-to-repl _file-name) (save-some-buffers)))
+  (advice-add 'inf-clojure-load-file :after (lambda (&optional _switch-to-repl _file-name) (inf-clojure-switch-to-repl t)))
 
   ;; both inf-clojure-mode and inf-clojure-minor-mode
-  (advice-add 'inf-clojure-eval-last-sexp :before (lambda (&optional switch-to-repl file-name) (save-some-buffers)))
-  (advice-add 'inf-clojure-eval-last-sexp :after (lambda (&optional switch-to-repl file-name) (inf-clojure-switch-to-repl t)))
+  (advice-add 'inf-clojure-eval-last-sexp :before (lambda (&optional _and-go) (save-some-buffers)))
+  (advice-add 'inf-clojure-eval-last-sexp :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
 
   ;; only inf-clojure-minor-mode
-  (advice-add 'inf-clojure-eval-defun :before (lambda (&optional switch-to-repl file-name) (save-some-buffers)))
-  (advice-add 'inf-clojure-eval-defun :after (lambda (&optional switch-to-repl file-name) (inf-clojure-switch-to-repl t)))
+  (advice-add 'inf-clojure-eval-defun :before (lambda (&optional _and-go) (save-some-buffers)))
+  (advice-add 'inf-clojure-eval-defun :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
 
   ;; only inf-clojure-minor-mode
-  (advice-add 'inf-clojure-eval-buffer :before (lambda (&optional switch-to-repl file-name) (save-some-buffers)))
-  (advice-add 'inf-clojure-eval-buffer :after (lambda (&optional switch-to-repl file-name) (inf-clojure-switch-to-repl t))))
+  (advice-add 'inf-clojure-eval-buffer :before (lambda (&optional _and-go) (save-some-buffers)))
+  (advice-add 'inf-clojure-eval-buffer :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t))))
 
 (provide 'clj-mvt-el)
 
