@@ -20,23 +20,37 @@ If you use the emacs package manager (i.e. package.el) and
 [[https://github.com/jwiegley/use-package][use-package]], then include the following in your emacs init file
 
 #+BEGIN_SRC emacs-lisp
-(use-package paredit
-  :ensure t
-  :diminish (paredit-mode . "pe"))
+  (use-package paredit
+    :ensure t
+    :diminish (paredit-mode . "pe"))
 
-(use-package inf-clojure
-  :ensure t
-  :init
-  (add-hook 'inf-clojure-mode-hook (lambda () (setq tab-width 4)))
-  (add-hook 'inf-clojure-mode-hook 'paredit-mode)
-  (add-hook 'inf-clojure-mode-hook 'clj-mvt-el-repl-minor-mode))
+  (use-package inf-clojure
+    :ensure t
+    :init
+    (add-hook 'inf-clojure-mode-hook (lambda () (setq tab-width 4)))
+    (add-hook 'inf-clojure-mode-hook 'paredit-mode)
+    (add-hook 'inf-clojure-mode-hook 'clj-mvt-el-repl-minor-mode)
+    (add-hook 'clj-mvt-el-repl-minor-mode-hook
+    (lambda ()
+      (let ((map clj-mvt-el-repl-minor-mode-map))
+            (define-key map "\C-cr" 'clj-mvt-el-reset)
+            (define-key map "\C-ct" 'clj-mvt-el-testit)
+            (define-key map "\C-cd" 'clj-mvt-el-toggle-break)
+            (define-key map "\C-c\S-r" 'clj-mvt-el-refresh-all))))
 
-(use-package clojure-mode
-  :ensure t
-  :init
-  (add-hook 'clojure-mode-hook 'paredit-mode)
-  (add-hook 'clojure-mode-hook 'inf-clojure-minor-mode)
-  (add-hook 'inf-clojure-minor-mode-hook 'clj-mvt-el-src-minor-mode))
+  (use-package clojure-mode
+    :ensure t
+    :init
+    (add-hook 'clojure-mode-hook 'paredit-mode)
+    (add-hook 'clojure-mode-hook 'inf-clojure-minor-mode)
+    (add-hook 'inf-clojure-minor-mode-hook 'clj-mvt-el-src-minor-mode)
+    (add-hook 'clj-mvt-el-src-minor-mode-hook
+    (lambda ()
+      (let ((map clj-mvt-el-src-minor-mode-map))
+            (define-key map "\C-cr" 'clj-mvt-el-reset)
+            (define-key map "\C-ct" 'clj-mvt-el-testit)
+            (define-key map "\C-cd" 'clj-mvt-el-toggle-break)
+            (define-key map "\C-c\S-r" 'clj-mvt-el-refresh-all))))
 #+END_SRC
 
 * Usage
