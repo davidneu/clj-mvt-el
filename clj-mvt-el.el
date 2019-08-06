@@ -135,31 +135,35 @@
    "(clj-mvt.breakpoint/toggle-break)")
   (inf-clojure-switch-to-repl t))
 
+(defvar clj-mvt-el-repl-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-c\C-p" 'clj-mvt-el-previous-prompt)
+    (define-key map "\C-c\C-mr" 'clj-mvt-el-reset)
+    (define-key map "\C-c\C-ma" 'clj-mvt-el-refresh-all)
+    (define-key map "\C-c\C-md" 'clj-mvt-el-toggle-break)
+    (define-key map "\C-c\C-mt" 'clj-mvt-el-testit)
+    (define-key map (kbd "C-<return>") 'clj-mvt-el-stacktrace-source-location)
+    map))
+
 ;;;###autoload
 (define-minor-mode clj-mvt-el-repl-minor-mode
   "A minor mode that extends `inf-clojure-mode` which provides a Clojure REPL."
   :lighter " mvt"
-  :keymap
+  :keymap clj-mvt-el-repl-minor-mode-map)
+
+(defvar clj-mvt-el-src-minor-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-p" 'clj-mvt-el-previous-prompt)
-    (define-key map (kbd "C-c r") 'clj-mvt-el-reset)
-    (define-key map (kbd "C-c t") 'clj-mvt-el-testit)
-    (define-key map "\C-c\S-r" 'clj-mvt-el-refresh-all)
-    (define-key map (kbd "C-<return>") 'clj-mvt-el-stacktrace-source-location)
-    (define-key map (kbd "C-c d") 'clj-mvt-el-toggle-break)
+    (define-key map "\C-c\C-mr" 'clj-mvt-el-reset)
+    (define-key map "\C-c\C-ma" 'clj-mvt-el-refresh-all)
+    (define-key map "\C-c\C-md" 'clj-mvt-el-toggle-break)
+    (define-key map "\C-c\C-mt" 'clj-mvt-el-testit)
     map))
 
 ;;;###autoload
 (define-minor-mode clj-mvt-el-src-minor-mode
   "A minor mode that extends `inf-clojure-minor-mode` which provides commands to evaluate Clojure forms in clojure-mode buffers in the REPL."
   :lighter " mvt"
-  :keymap
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c r") 'clj-mvt-el-reset)
-    (define-key map (kbd "C-c t") 'clj-mvt-el-testit)
-    (define-key map (kbd "C-c d") 'clj-mvt-el-toggle-break)
-    (define-key map "\C-c\S-r" 'clj-mvt-el-refresh-all)
-    map))
+  :keymap clj-mvt-el-src-minor-mode-map)
 
 ;;;###autoload
 (progn
