@@ -1,10 +1,10 @@
-;;; clj-mvt-el.el --- Adds functionality to inf-clojure to support clj-mvt -*- lexical-binding: t; -*-
+;;; clj-mvt-modes.el --- Adds functionality to inf-clojure to support clj-mvt -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  David Neu
 
 ;; Author: David Neu <david@davidneu.com>
 
-;; URL: https://github.com/davidneu/clj-mvt-el
+;; URL: https://github.com/davidneu/clj-mvt-modes
 ;; Keywords: processes, clojure
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "24.4") (clojure-mode "5.6") (inf-clojure "2.1.0"))
@@ -29,12 +29,11 @@
 ;; This package adds functionality to the inf-clojure package to
 ;; support clj-mvt.
 
-;; `clj-mvt-el` has two components - a minor mode called
-;; `clj-mvt-el-repl-minor-mode` that extends 'inf-clojure-mode' which
-;; provides a Clojure REPL, and a minor mode called
-;; `clj-mvt-el-src-minor-mode` that extends `inf-clojure-minor-mode`
-;; which provides commands to evaluate Clojure forms in clojure-mode
-;; buffers in the REPL.
+;; `clj-mvt` has two components - a minor mode called
+;; `clj-mvt-repl-mode` that extends 'inf-clojure-mode' which provides
+;; a Clojure REPL, and a minor mode called `clj-mvt-src-mode` that
+;; extends `inf-clojure-minor-mode` which provides commands to
+;; evaluate Clojure forms in clojure-mode buffers in the REPL.
 
 ;;; Code:
 
@@ -43,9 +42,9 @@
 (require 'clojure-mode)
 (require 'inf-clojure)
 
-;; Usage: (clj-mvt-el-goto-source-location-in-jar absolute-path-to-jar file-in-jar),
-;; e.g. (clj-mvt-el-goto-source-location-in-jar /home/me/.m2/clj-stacktrace/clj-stacktrace/0.2.8/clj-stacktrace-0.2.8.jar clj_stacktrace/utils.clj)
-(defun clj-mvt-el-goto-source-location-in-jar (jar-filename filename-in-jar line-number)
+;; Usage: (clj-mvt-goto-source-location-in-jar absolute-path-to-jar file-in-jar),
+;; e.g. (clj-mvt-goto-source-location-in-jar /home/me/.m2/clj-stacktrace/clj-stacktrace/0.2.8/clj-stacktrace-0.2.8.jar clj_stacktrace/utils.clj)
+(defun clj-mvt-goto-source-location-in-jar (jar-filename filename-in-jar line-number)
   "Go to LINE-NUMBER of FILENAME-IN-JAR in JAR-FILENAME."
   (let ((name (format "%s:%s" jar-filename filename-in-jar)))
     (switch-to-buffer-other-window
@@ -62,7 +61,7 @@
     (with-no-warnings
       (goto-line line-number))))
 
-(defun clj-mvt-el-stacktrace-source-location ()
+(defun clj-mvt-stacktrace-source-location ()
   "Go to the source file location corresponding to the current line in the stacktrace."
   (interactive)
   (let* ((line
@@ -89,11 +88,11 @@
     	   (let* ((jar-filename (cl-first filename-line-number))
     		  (filename (cl-second filename-line-number))
     		  (line-number (string-to-number (cl-third filename-line-number))))
-    	     (clj-mvt-el-goto-source-location-in-jar jar-filename filename line-number)))
+    	     (clj-mvt-goto-source-location-in-jar jar-filename filename line-number)))
     	  (t
-    	   (message "clj-mvt-el-stacktrace-source-location: invalid format")))))
+    	   (message "clj-mvt-stacktrace-source-location: invalid format")))))
 
-(defun clj-mvt-el-reset ()
+(defun clj-mvt-reset ()
   "Call (clj-mvt.tools/reset (find-ns 'dev))."
   (interactive)
   (save-some-buffers)
@@ -102,7 +101,7 @@
    "(clj-mvt.tools/reset (find-ns 'dev))")
   (inf-clojure-switch-to-repl t))
 
-(defun clj-mvt-el-testit ()
+(defun clj-mvt-testit ()
   "Call (clj-mvt.tools/testit)."
   (interactive)
   (save-some-buffers)
@@ -111,7 +110,7 @@
    "(clj-mvt.tools/testit)")
   (inf-clojure-switch-to-repl t))
   
-(defun clj-mvt-el-refresh-all ()
+(defun clj-mvt-refresh-all ()
   "Call (clojure.tools.namespace.repl/refresh-all)."
   (interactive)
   (save-some-buffers)
@@ -120,14 +119,14 @@
    "(clojure.tools.namespace.repl/refresh-all)")
   (inf-clojure-switch-to-repl t))
 
-(defun clj-mvt-el-previous-prompt ()
+(defun clj-mvt-previous-prompt ()
   "Move the point to the previous repl prompt."
   (interactive)
   (re-search-backward "=>")
   (re-search-backward "=>")
   (end-of-line))
 
-(defun clj-mvt-el-toggle-break ()
+(defun clj-mvt-toggle-break ()
   "Call (clj-mvt.breakpoint/toggle-break)."
   (interactive)
   (inf-clojure--send-string
@@ -135,35 +134,35 @@
    "(clj-mvt.breakpoint/toggle-break)")
   (inf-clojure-switch-to-repl t))
 
-(defvar clj-mvt-el-repl-minor-mode-map
+(defvar clj-mvt-repl-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-p" #'clj-mvt-el-previous-prompt)
-    (define-key map "\C-c\C-mr" #'clj-mvt-el-reset)
-    (define-key map "\C-c\C-ma" #'clj-mvt-el-refresh-all)
-    (define-key map "\C-c\C-md" #'clj-mvt-el-toggle-break)
-    (define-key map "\C-c\C-mt" #'clj-mvt-el-testit)
-    (define-key map (kbd "C-<return>") #'clj-mvt-el-stacktrace-source-location)
+    (define-key map "\C-c\C-p" #'clj-mvt-previous-prompt)
+    (define-key map "\C-c\C-mr" #'clj-mvt-reset)
+    (define-key map "\C-c\C-ma" #'clj-mvt-refresh-all)
+    (define-key map "\C-c\C-md" #'clj-mvt-toggle-break)
+    (define-key map "\C-c\C-mt" #'clj-mvt-testit)
+    (define-key map (kbd "C-<return>") #'clj-mvt-stacktrace-source-location)
     map))
 
 ;;;###autoload
-(define-minor-mode clj-mvt-el-repl-minor-mode
+(define-minor-mode clj-mvt-repl-mode
   "A minor mode that extends `inf-clojure-mode` which provides a Clojure REPL."
   :lighter " mvt"
-  :keymap clj-mvt-el-repl-minor-mode-map)
+  :keymap clj-mvt-repl-mode-map)
 
-(defvar clj-mvt-el-src-minor-mode-map
+(defvar clj-mvt-src-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-mr" #'clj-mvt-el-reset)
-    (define-key map "\C-c\C-ma" #'clj-mvt-el-refresh-all)
-    (define-key map "\C-c\C-md" #'clj-mvt-el-toggle-break)
-    (define-key map "\C-c\C-mt" #'clj-mvt-el-testit)
+    (define-key map "\C-c\C-mr" #'clj-mvt-reset)
+    (define-key map "\C-c\C-ma" #'clj-mvt-refresh-all)
+    (define-key map "\C-c\C-md" #'clj-mvt-toggle-break)
+    (define-key map "\C-c\C-mt" #'clj-mvt-testit)
     map))
 
 ;;;###autoload
-(define-minor-mode clj-mvt-el-src-minor-mode
+(define-minor-mode clj-mvt-src-mode
   "A minor mode that extends `inf-clojure-minor-mode` which provides commands to evaluate Clojure forms in clojure-mode buffers in the REPL."
   :lighter " mvt"
-  :keymap clj-mvt-el-src-minor-mode-map)
+  :keymap clj-mvt-src-mode-map)
 
 ;;;###autoload
 (progn
@@ -183,7 +182,7 @@
   (advice-add #'inf-clojure-eval-buffer :before (lambda (&optional _and-go) (save-some-buffers)))
   (advice-add #'inf-clojure-eval-buffer :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t))))
 
-(provide 'clj-mvt-el)
+(provide 'clj-mvt-modes)
 
-;;; clj-mvt-el.el ends here
+;;; clj-mvt-modes.el ends here
 
