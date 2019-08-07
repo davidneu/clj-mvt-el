@@ -4,7 +4,7 @@
 
 ;; Author: David Neu <david@davidneu.com>
 
-;; URL: http://github.com/davidneu/clj-mvt-el
+;; URL: https://github.com/davidneu/clj-mvt-el
 ;; Keywords: processes, clojure
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "24.4") (clojure-mode "5.6") (inf-clojure "2.1.0"))
@@ -22,7 +22,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -74,11 +74,11 @@
 	      (let* ((location (replace-regexp-in-string "^Location: " "" line)))
 		(split-string location ":"))
 	    (let* ((file-function (split-string (substring line 1 (- (length line) 1)) "|"))
-		   (location (string-trim (first file-function))))
+		   (location (string-trim (cl-first file-function))))
 	      (split-string location ":")))))
     (cond ((= (length filename-line-number) 2)
-    	   (let* ((filename (first filename-line-number))
-    		  (line-number (string-to-number (second filename-line-number))))
+    	   (let* ((filename (cl-first filename-line-number))
+    		  (line-number (string-to-number (cl-second filename-line-number))))
     	     (switch-to-buffer-other-window
     	      (or
     	       (find-buffer-visiting filename)
@@ -86,9 +86,9 @@
 	     (with-no-warnings
     	       (goto-line line-number))))
     	  ((= (length filename-line-number) 3)
-    	   (let* ((jar-filename (first filename-line-number))
-    		  (filename (second filename-line-number))
-    		  (line-number (string-to-number (third filename-line-number))))
+    	   (let* ((jar-filename (cl-first filename-line-number))
+    		  (filename (cl-second filename-line-number))
+    		  (line-number (string-to-number (cl-third filename-line-number))))
     	     (clj-mvt-el-goto-source-location-in-jar jar-filename filename line-number)))
     	  (t
     	   (message "clj-mvt-el-stacktrace-source-location: invalid format")))))
@@ -137,12 +137,12 @@
 
 (defvar clj-mvt-el-repl-minor-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-p" 'clj-mvt-el-previous-prompt)
-    (define-key map "\C-c\C-mr" 'clj-mvt-el-reset)
-    (define-key map "\C-c\C-ma" 'clj-mvt-el-refresh-all)
-    (define-key map "\C-c\C-md" 'clj-mvt-el-toggle-break)
-    (define-key map "\C-c\C-mt" 'clj-mvt-el-testit)
-    (define-key map (kbd "C-<return>") 'clj-mvt-el-stacktrace-source-location)
+    (define-key map "\C-c\C-p" #'clj-mvt-el-previous-prompt)
+    (define-key map "\C-c\C-mr" #'clj-mvt-el-reset)
+    (define-key map "\C-c\C-ma" #'clj-mvt-el-refresh-all)
+    (define-key map "\C-c\C-md" #'clj-mvt-el-toggle-break)
+    (define-key map "\C-c\C-mt" #'clj-mvt-el-testit)
+    (define-key map (kbd "C-<return>") #'clj-mvt-el-stacktrace-source-location)
     map))
 
 ;;;###autoload
@@ -153,10 +153,10 @@
 
 (defvar clj-mvt-el-src-minor-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-mr" 'clj-mvt-el-reset)
-    (define-key map "\C-c\C-ma" 'clj-mvt-el-refresh-all)
-    (define-key map "\C-c\C-md" 'clj-mvt-el-toggle-break)
-    (define-key map "\C-c\C-mt" 'clj-mvt-el-testit)
+    (define-key map "\C-c\C-mr" #'clj-mvt-el-reset)
+    (define-key map "\C-c\C-ma" #'clj-mvt-el-refresh-all)
+    (define-key map "\C-c\C-md" #'clj-mvt-el-toggle-break)
+    (define-key map "\C-c\C-mt" #'clj-mvt-el-testit)
     map))
 
 ;;;###autoload
@@ -168,20 +168,20 @@
 ;;;###autoload
 (progn
   ;; both inf-clojure-mode and inf-clojure-minor-mode
-  (advice-add 'inf-clojure-load-file :before (lambda (&optional _switch-to-repl _file-name) (save-some-buffers)))
-  (advice-add 'inf-clojure-load-file :after (lambda (&optional _switch-to-repl _file-name) (inf-clojure-switch-to-repl t)))
+  (advice-add #'inf-clojure-load-file :before (lambda (&optional _switch-to-repl _file-name) (save-some-buffers)))
+  (advice-add #'inf-clojure-load-file :after (lambda (&optional _switch-to-repl _file-name) (inf-clojure-switch-to-repl t)))
 
   ;; both inf-clojure-mode and inf-clojure-minor-mode
-  (advice-add 'inf-clojure-eval-last-sexp :before (lambda (&optional _and-go) (save-some-buffers)))
-  (advice-add 'inf-clojure-eval-last-sexp :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
+  (advice-add #'inf-clojure-eval-last-sexp :before (lambda (&optional _and-go) (save-some-buffers)))
+  (advice-add #'inf-clojure-eval-last-sexp :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
 
   ;; only inf-clojure-minor-mode
-  (advice-add 'inf-clojure-eval-defun :before (lambda (&optional _and-go) (save-some-buffers)))
-  (advice-add 'inf-clojure-eval-defun :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
+  (advice-add #'inf-clojure-eval-defun :before (lambda (&optional _and-go) (save-some-buffers)))
+  (advice-add #'inf-clojure-eval-defun :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
 
   ;; only inf-clojure-minor-mode
-  (advice-add 'inf-clojure-eval-buffer :before (lambda (&optional _and-go) (save-some-buffers)))
-  (advice-add 'inf-clojure-eval-buffer :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t))))
+  (advice-add #'inf-clojure-eval-buffer :before (lambda (&optional _and-go) (save-some-buffers)))
+  (advice-add #'inf-clojure-eval-buffer :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t))))
 
 (provide 'clj-mvt-el)
 
