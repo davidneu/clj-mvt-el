@@ -1,13 +1,13 @@
-#+title:   clj-mvt-modes
+#+title:   Emacs modes for clj-mvt
 #+startup: showall
 #+OPTIONS: toc:nil author:nil timestamp:nil
 
 * Overview
 
 The [[https://github.com/davidneu/clj-mvt][clj-mvt]], /minimum viable toolset/, library provides a small set of
-Clojure tools that combined with emacs and the [[https://github.com/davidneu/clj-mvt-modes][clj-mvt-modes]],
-[[https://github.com/clojure-emacs/clojure-mode][clojure-mode]], and [[https://github.com/clojure-emacs/inf-clojure][inf-clojure]] emacs packages, provide a simple REPL
-driven development environment.
+Clojure tools that combined with emacs and the [[https://github.com/davidneu/clj-mvt-modes][clj-mvt]], [[https://github.com/clojure-emacs/clojure-mode][clojure-mode]],
+and [[https://github.com/clojure-emacs/inf-clojure][inf-clojure]] emacs packages, provide a simple REPL driven
+development environment.
 
 * Requirements
 
