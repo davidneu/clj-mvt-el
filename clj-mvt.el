@@ -1,4 +1,4 @@
-;;; clj-mvt-modes.el --- Adds functionality to inf-clojure to support clj-mvt -*- lexical-binding: t; -*-
+;;; clj-mvt.el --- Adds functionality to inf-clojure to support clj-mvt -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  David Neu
 
@@ -134,6 +134,18 @@
    "(clj-mvt.breakpoint/toggle-break)")
   (inf-clojure-switch-to-repl t))
 
+(defun clj-mvt-load-file-save-some-buffers (&optional _switch-to-repl _file-name)
+  (save-some-buffers))
+
+(defun clj-mvt-load-file-switch-to-repl (&optional _switch-to-repl _file-name)
+  (inf-clojure-switch-to-repl t))
+
+(defun clj-mvt-eval-save-some-buffers (&optional _and-go)
+  (save-some-buffers))
+
+(defun clj-mvt-eval-switch-to-repl (&optional _and-go)
+  (inf-clojure-switch-to-repl t))
+
 (defvar clj-mvt-repl-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-p" #'clj-mvt-previous-prompt)
@@ -148,7 +160,18 @@
 (define-minor-mode clj-mvt-repl-mode
   "A minor mode that extends `inf-clojure-mode` which provides a Clojure REPL."
   :lighter " mvt"
-  :keymap clj-mvt-repl-mode-map)
+  :keymap clj-mvt-repl-mode-map
+  (if clj-mvt-repl-mode
+      (progn
+	(advice-add #'inf-clojure-load-file :before #'clj-mvt-load-file-save-some-buffers)
+	(advice-add #'inf-clojure-load-file :after #'clj-mvt-load-file-switch-to-repl)
+	(advice-add #'inf-clojure-eval-last-sexp :before #'clj-mvt-eval-save-some-buffers)
+	(advice-add #'inf-clojure-eval-last-sexp :after #'clj-mvt-eval-switch-to-repl))
+    (progn
+      (advice-remove 'inf-clojure-load-file #'clj-mvt-load-file-save-some-buffers)
+      (advice-remove 'inf-clojure-load-file #'clj-mvt-load-file-switch-to-repl)
+      (advice-remove 'inf-clojure-eval-last-sexp #'clj-mvt-eval-save-some-buffers)
+      (advice-remove 'inf-clojure-eval-last-sexp #'clj-mvt-eval-switch-to-repl))))
 
 (defvar clj-mvt-src-mode-map
   (let ((map (make-sparse-keymap)))
@@ -162,27 +185,28 @@
 (define-minor-mode clj-mvt-src-mode
   "A minor mode that extends `inf-clojure-minor-mode` which provides commands to evaluate Clojure forms in clojure-mode buffers in the REPL."
   :lighter " mvt"
-  :keymap clj-mvt-src-mode-map)
+  :keymap clj-mvt-src-mode-map
+  (if clj-mvt-src-mode
+      (progn
+	(advice-add #'inf-clojure-load-file :before #'clj-mvt-load-file-save-some-buffers)
+	(advice-add #'inf-clojure-load-file :after #'clj-mvt-load-file-switch-to-repl)
+	(advice-add #'inf-clojure-eval-last-sexp :before #'clj-mvt-eval-save-some-buffers)
+	(advice-add #'inf-clojure-eval-last-sexp :after #'clj-mvt-eval-switch-to-repl)
+	(advice-add #'inf-clojure-eval-defun :before #'clj-mvt-eval-save-some-buffers)
+	(advice-add #'inf-clojure-eval-defun :after #'clj-mvt-eval-switch-to-repl)
+	(advice-add #'inf-clojure-eval-buffer :before #'clj-mvt-eval-save-some-buffers)
+	(advice-add #'inf-clojure-eval-buffer :after #'clj-mvt-eval-switch-to-repl))
+    (progn
+      (advice-remove 'inf-clojure-load-file #'clj-mvt-load-file-save-some-buffers)
+      (advice-remove 'inf-clojure-load-file #'clj-mvt-load-file-switch-to-repl)
+      (advice-remove 'inf-clojure-eval-last-sexp #'clj-mvt-eval-save-some-buffers)
+      (advice-remove 'inf-clojure-eval-last-sexp #'clj-mvt-eval-switch-to-repl)
+      (advice-remove 'inf-clojure-eval-defun #'clj-mvt-eval-save-some-buffers)
+      (advice-remove 'inf-clojure-eval-defun #'clj-mvt-eval-switch-to-repl)
+      (advice-remove 'inf-clojure-eval-buffer #'clj-mvt-eval-save-some-buffers)
+      (advice-remove 'inf-clojure-eval-buffer #'clj-mvt-eval-switch-to-repl))))
 
-;;;###autoload
-(progn
-  ;; both inf-clojure-mode and inf-clojure-minor-mode
-  (advice-add #'inf-clojure-load-file :before (lambda (&optional _switch-to-repl _file-name) (save-some-buffers)))
-  (advice-add #'inf-clojure-load-file :after (lambda (&optional _switch-to-repl _file-name) (inf-clojure-switch-to-repl t)))
+(provide 'clj-mvt)
 
-  ;; both inf-clojure-mode and inf-clojure-minor-mode
-  (advice-add #'inf-clojure-eval-last-sexp :before (lambda (&optional _and-go) (save-some-buffers)))
-  (advice-add #'inf-clojure-eval-last-sexp :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
-
-  ;; only inf-clojure-minor-mode
-  (advice-add #'inf-clojure-eval-defun :before (lambda (&optional _and-go) (save-some-buffers)))
-  (advice-add #'inf-clojure-eval-defun :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t)))
-
-  ;; only inf-clojure-minor-mode
-  (advice-add #'inf-clojure-eval-buffer :before (lambda (&optional _and-go) (save-some-buffers)))
-  (advice-add #'inf-clojure-eval-buffer :after (lambda (&optional _and-go) (inf-clojure-switch-to-repl t))))
-
-(provide 'clj-mvt-modes)
-
-;;; clj-mvt-modes.el ends here
+;;; clj-mvt.el ends here
 
