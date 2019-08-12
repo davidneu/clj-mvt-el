@@ -135,15 +135,19 @@
   (inf-clojure-switch-to-repl t))
 
 (defun clj-mvt-load-file-save-some-buffers (&optional _switch-to-repl _file-name)
+  "Call `save-some-buffers' before `inf-clojure-load-file'."
   (save-some-buffers))
 
 (defun clj-mvt-load-file-switch-to-repl (&optional _switch-to-repl _file-name)
+  "Call `inf-clojure-switch-to-repl' after `inf-clojure-load-file'."
   (inf-clojure-switch-to-repl t))
 
 (defun clj-mvt-eval-save-some-buffers (&optional _and-go)
+  "Call `save-some-buffers' before `inf-clojure-eval-last-sexp',`inf-clojure-eval-defun', and `inf-clojure-eval-buffer'."
   (save-some-buffers))
 
 (defun clj-mvt-eval-switch-to-repl (&optional _and-go)
+  "Call `inf-clojure-switch-to-repl' after `inf-clojure-eval-last-sexp',`inf-clojure-eval-defun', and `inf-clojure-eval-buffer'."
   (inf-clojure-switch-to-repl t))
 
 (defvar clj-mvt-repl-mode-map
